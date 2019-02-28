@@ -63,9 +63,14 @@ int janus_sdp_process(void *ice_handle, janus_sdp *remote_sdp, gboolean update) 
 	if(!ice_handle || !remote_sdp)
 		return -1;
 	janus_ice_handle *handle = (janus_ice_handle *)ice_handle;
+
+	JANUS_LOG(LOG_WARN, "[%"SCNu64"]  In SDP process\n", handle->handle_id);
+
 	janus_ice_stream *stream = handle->stream;
-	if(!stream)
+	if(!stream) {
+		JANUS_LOG(LOG_WARN, "[%"SCNu64"]  A20\n", handle->handle_id);
 		return -1;
+	}
 	gchar *ruser = NULL, *rpass = NULL, *rhashing = NULL, *rfingerprint = NULL;
 	int audio = 0, video = 0;
 #ifdef HAVE_SCTP
@@ -77,6 +82,8 @@ int janus_sdp_process(void *ice_handle, janus_sdp *remote_sdp, gboolean update) 
 	while(temp) {
 		janus_sdp_attribute *a = (janus_sdp_attribute *)temp->data;
 		if(a && a->name) {
+			JANUS_LOG(LOG_WARN, "[%"SCNu64"]  A1\n", handle->handle_id);
+
 			if(!strcasecmp(a->name, "fingerprint")) {
 				JANUS_LOG(LOG_VERB, "[%"SCNu64"] Fingerprint (global) : %s\n", handle->handle_id, a->value);
 				if(strcasestr(a->value, "sha-256 ") == a->value) {
@@ -103,6 +110,7 @@ int janus_sdp_process(void *ice_handle, janus_sdp *remote_sdp, gboolean update) 
 	/* Now go on with m-line and their attributes */
 	int mlines = 0;
 	temp = remote_sdp->m_lines;
+	JANUS_LOG(LOG_WARN, "[%"SCNu64"]  A2\n", handle->handle_id);
 	while(temp) {
 		mlines++;
 		janus_sdp_mline *m = (janus_sdp_mline *)temp->data;
@@ -246,6 +254,8 @@ int janus_sdp_process(void *ice_handle, janus_sdp *remote_sdp, gboolean update) 
 			temp = temp->next;
 			continue;
 		}
+		JANUS_LOG(LOG_WARN, "[%"SCNu64"]  A3\n", handle->handle_id);
+
 		/* Look for mid, ICE credentials and fingerprint first: check media attributes */
 		GList *tempA = m->attributes;
 		while(tempA) {
@@ -317,6 +327,7 @@ int janus_sdp_process(void *ice_handle, janus_sdp *remote_sdp, gboolean update) 
 			}
 			tempA = tempA->next;
 		}
+		JANUS_LOG(LOG_WARN, "[%"SCNu64"]  A4\n", handle->handle_id);
 		if(mlines == 1) {
 			if(!ruser || !rpass || !rfingerprint || !rhashing) {
 				/* Missing mandatory information, failure... */
@@ -332,6 +343,7 @@ int janus_sdp_process(void *ice_handle, janus_sdp *remote_sdp, gboolean update) 
 				if(rfingerprint)
 					g_free(rfingerprint);
 				rfingerprint = NULL;
+				JANUS_LOG(LOG_WARN, "[%"SCNu64"]  A21\n", handle->handle_id);
 				return -2;
 			}
 			/* If this is a renegotiation, check if this is an ICE restart */
@@ -352,6 +364,7 @@ int janus_sdp_process(void *ice_handle, janus_sdp *remote_sdp, gboolean update) 
 			g_free(stream->rpass);
 			stream->rpass = g_strdup(rpass);
 		}
+		JANUS_LOG(LOG_WARN, "[%"SCNu64"]  A5\n", handle->handle_id);
 		/* Is simulcasting enabled, using rid? (we need to check this before parsing SSRCs) */
 		tempA = m->attributes;
 		while(tempA) {
@@ -398,6 +411,8 @@ int janus_sdp_process(void *ice_handle, janus_sdp *remote_sdp, gboolean update) 
 			}
 			tempA = tempA->next;
 		}
+		JANUS_LOG(LOG_WARN, "[%"SCNu64"]  A6\n", handle->handle_id);
+
 		/* Any SSRC FID group? */
 		tempA = m->attributes;
 		while(tempA) {
@@ -412,6 +427,8 @@ int janus_sdp_process(void *ice_handle, janus_sdp *remote_sdp, gboolean update) 
 			}
 			tempA = tempA->next;
 		}
+		JANUS_LOG(LOG_WARN, "[%"SCNu64"]  A7\n", handle->handle_id);
+
 		/* Any SSRC in general? */
 		tempA = m->attributes;
 		while(tempA) {
@@ -426,6 +443,7 @@ int janus_sdp_process(void *ice_handle, janus_sdp *remote_sdp, gboolean update) 
 			}
 			tempA = tempA->next;
 		}
+		JANUS_LOG(LOG_WARN, "[%"SCNu64"]  A8\n", handle->handle_id);
 		/* Now look for candidates and other info */
 		tempA = m->attributes;
 		while(tempA) {
@@ -482,6 +500,8 @@ int janus_sdp_process(void *ice_handle, janus_sdp *remote_sdp, gboolean update) 
 			}
 			tempA = tempA->next;
 		}
+		JANUS_LOG(LOG_WARN, "[%"SCNu64"]  A9\n", handle->handle_id);
+
 		/* Any change in SSRCs we should be aware of? */
 		if(m->type == JANUS_SDP_AUDIO) {
 			if(stream->audio_ssrc_peer_new > 0) {
@@ -548,6 +568,8 @@ int janus_sdp_process(void *ice_handle, janus_sdp *remote_sdp, gboolean update) 
 		}
 		temp = temp->next;
 	}
+	JANUS_LOG(LOG_WARN, "[%"SCNu64"]  A10\n", handle->handle_id);
+
 	/* Disable RFC4588 if the peer didn't negotiate it */
 	if(!rtx) {
 		janus_flags_clear(&handle->webrtc_flags, JANUS_ICE_HANDLE_WEBRTC_RFC4588_RTX);
@@ -558,6 +580,8 @@ int janus_sdp_process(void *ice_handle, janus_sdp *remote_sdp, gboolean update) 
 	g_free(rpass);
 	g_free(rhashing);
 	g_free(rfingerprint);
+
+	JANUS_LOG(LOG_WARN, "[%"SCNu64"]  A11\n", handle->handle_id);
 
 	return 0;	/* FIXME Handle errors better */
 }
