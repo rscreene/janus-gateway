@@ -147,6 +147,7 @@ int main(int argc, char *argv[])
 
 	janus_log_init(FALSE, TRUE, NULL);
 	atexit(janus_log_destroy);
+	JANUS_LOG(LOG_INFO, "1");
 
 	/* If we're asked to print the JSON header as it is, we must not print anything else */
 	gboolean jsonheader_only = FALSE, header_only = FALSE, parse_only = FALSE;
@@ -180,6 +181,8 @@ int main(int argc, char *argv[])
 		if(val >= 0)
 			ignore_first_packets = val;
 	}
+	JANUS_LOG(LOG_INFO, "2");
+
 	if(args_info.audiolevel_ext_given || (g_getenv("JANUS_PPREC_AUDIOLEVELEXT") != NULL)) {
 		int val = args_info.audiolevel_ext_given ? args_info.audiolevel_ext_arg : atoi(g_getenv("JANUS_PPREC_AUDIOLEVELEXT"));
 		if(val >= 0)
@@ -223,6 +226,8 @@ int main(int argc, char *argv[])
 		}
 		setting = NULL;
 	}
+	JANUS_LOG(LOG_INFO, "3");
+
 	if(source == NULL || (destination == NULL && !jsonheader_only && !header_only && !parse_only)) {
 		cmdline_parser_print_help();
 		cmdline_parser_free(&args_info);
@@ -255,6 +260,7 @@ int main(int argc, char *argv[])
 			JANUS_LOG(LOG_INFO, "Target file: %s\n", destination);
 		JANUS_LOG(LOG_INFO, "\n");
 	}
+	JANUS_LOG(LOG_INFO, "4");
 
 	if((destination != NULL) && (extension == NULL)) {
 		/* Check the extension of the target file */
@@ -275,6 +281,8 @@ int main(int argc, char *argv[])
 			exit(1);
 		}
 	}
+	JANUS_LOG(LOG_INFO, "5");
+
 	FILE *file = fopen(source, "rb");
 	if(file == NULL) {
 		JANUS_LOG(LOG_ERR, "Could not open file %s\n", source);
@@ -290,6 +298,7 @@ int main(int argc, char *argv[])
 	/* Handle SIGINT */
 	working = 1;
 	signal(SIGINT, janus_pp_handle_signal);
+	JANUS_LOG(LOG_INFO, "6");
 
 	/* Pre-parse */
 	if(!jsonheader_only)
@@ -311,6 +320,7 @@ int main(int argc, char *argv[])
 	memset(prebuffer2, 0, 1500);
 	/* Let's look for timestamp resets first */
 	while(working && offset < fsize) {
+		JANUS_LOG(LOG_INFO, "7");
 		if(header_only && parsed_header) {
 			/* We only needed to parse the header */
 			cmdline_parser_free(&args_info);
