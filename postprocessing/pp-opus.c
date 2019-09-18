@@ -50,7 +50,7 @@ int janus_pp_opus_create(char *destination, char *metadata) {
 	JANUS_LOG(LOG_ERR, "destination=%s\n", destination);
 	ogg_file = fopen(destination, "wb");
 	if(ogg_file == NULL) {
-		JANUS_LOG(LOG_ERR, "Couldn't open output file %d\n", errno);
+		JANUS_LOG(LOG_ERR, "Couldn't open output file\n");
 		return -1;
 	}
 	JANUS_LOG(LOG_INFO, "Writing .opus file header\n");
