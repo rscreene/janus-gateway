@@ -18,6 +18,7 @@
 #include <inttypes.h>
 #include <string.h>
 #include <stdlib.h>
+#include <errno.h>
 
 #include <ogg/ogg.h>
 
@@ -50,7 +51,7 @@ int janus_pp_opus_create(char *destination, char *metadata) {
 	JANUS_LOG(LOG_ERR, "destination=%s\n", destination);
 	ogg_file = fopen(destination, "wb");
 	if(ogg_file == NULL) {
-		JANUS_LOG(LOG_ERR, "Couldn't open output file\n");
+		JANUS_LOG(LOG_ERR, "Couldn't open output file %d %s\n", errno, strerror(errno));
 		return -1;
 	}
 	JANUS_LOG(LOG_INFO, "Writing .opus file header\n");
