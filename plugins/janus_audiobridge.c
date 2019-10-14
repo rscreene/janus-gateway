@@ -555,9 +555,9 @@ room-<unique room ID>: {
  * which will only include the \c room and the updated participant as the
  * only object in a \c participants array.
  *
- * If you're the administrator of a room (that is, you created it and have access to the secret) 
+ * If you're the administrator of a room (that is, you created it and have access to the secret)
  * you can mute or unmute participants using the \c mute or \c unmute request
- * 
+ *
  \verbatim
 {
 	"request" : "<mute|unmute, whether to mute or unmute >",
@@ -568,13 +568,13 @@ room-<unique room ID>: {
 \endverbatim
  *
  * A successful request will result in a success response:
- * 
+ *
  \verbatim
 {
 	"audiobridge" : "success",
 }
 \endverbatim
- * 
+ *
  * As anticipated, you can leave an audio room using the \c leave request,
  * which has to be formatted as follows:
  *
@@ -2401,7 +2401,7 @@ static json_t *janus_audiobridge_process_synchronous_request(janus_audiobridge_s
 		}
 
 		if(participant->muted == muted) {
-			/* If someone trying to mute an already muted user, or trying to unmute a user that is not mute), 
+			/* If someone trying to mute an already muted user, or trying to unmute a user that is not mute),
 			then we should do nothing */
 
 			/* Nothing to do, just prepare response */
@@ -4427,7 +4427,7 @@ static void *janus_audiobridge_mixer_thread(void *data) {
 		}
 		audiobridge->recording = fopen(filename, "wb");
 		if(audiobridge->recording == NULL) {
-			JANUS_LOG(LOG_WARN, "Recording requested, but could NOT open file %s for writing...\n", filename);
+			JANUS_LOG(LOG_WARN, "Recording requested, but could NOT open file %s for writing...\n%d %s\n", filename, errno, strerror(errno));
 		} else {
 			JANUS_LOG(LOG_VERB, "Recording requested, opened file %s for writing\n", filename);
 			/* Write WAV header */
